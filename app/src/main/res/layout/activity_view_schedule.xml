@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Activities.ViewSchedule"
+    android:id="@+id/mainLayout"
+    android:background="@drawable/main_bg">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:text="SCHEDULE DETAILS"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:background="@color/colorAccent"
+                />
+
+            <TextView
+                android:id="@+id/schedDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:textSize="12sp"
+                />
+
+            <TableLayout
+                android:layout_margin="5dp"
+                android:id="@+id/schedule"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/tbl_border"
+                android:padding="10dp">
+
+                <TableRow
+                    android:id="@+id/headers"
+                    android:background="@drawable/border"
+                    >
+                    <TextView
+                        android:padding="4dp"
+                        android:text="Team"
+                        android:textStyle="bold"
+                        android:textSize="12dp"/>
+
+                    <TextView
+
+                        android:padding="4dp"
+                        android:text="vs"
+                        android:textStyle="bold"
+                        android:textSize="12dp"/>
+
+                    <TextView
+
+                        android:padding="4dp"
+                        android:text="Team"
+                        android:textStyle="bold"
+                        android:textSize="12dp"/>
+
+                    <TextView
+
+                        android:padding="4dp"
+                        android:text="Round"
+                        android:textStyle="bold"
+                        android:textSize="12dp"/>
+
+                    <TextView
+
+                        android:padding="4dp"
+                        android:text="Game"
+                        android:textStyle="bold"
+                        android:textSize="12dp"/>
+
+                </TableRow>
+            </TableLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

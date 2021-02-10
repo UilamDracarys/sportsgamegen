@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Sports Game Generator</string>
+    <string-array name="sports">
+        <item>Select Sport...</item>
+        <item>Basketball</item>
+    </string-array>
+</resources>

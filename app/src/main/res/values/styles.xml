@@ -1,0 +1,17 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">#519657</item>
+        <item name="colorPrimaryDark">#338a3e</item>
+        <item name="colorAccent">#66bb6a</item>
+        <!--338a3e-->
+    </style>
+
+    <style name="TextInputHint" parent="TextAppearance.Design.Error">
+        <item name="android:textSize">9sp</item>
+        <item name="android:textColor">#66bb6a</item>
+        <item name="android:textStyle">italic</item>
+    </style>
+
+</resources>
