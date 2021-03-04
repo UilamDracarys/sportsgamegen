@@ -17,34 +17,40 @@ import com.cpsu.sportgamegenerator.Data.Repo.SchedRepo;
 import com.cpsu.sportgamegenerator.R;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class CreateSchedule extends AppCompatActivity implements View.OnClickListener {
+public class CreateSchedule extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
 
     TextView txtTeams;
     int noOfTeams;
     List<String> teams = new ArrayList<>();
     List<String> origTeams = new ArrayList<>();
-    ArrayList<HashMap<String, String>> schedule;
-    LinearLayout teamNamesLayout;
+    ArrayList<HashMap<String, String>> schedule, gameSchedule;
+    LinearLayout teamNamesLayout, gamesSchedLayout;
     String type, sport;
     TextView mUpdate;
     TableLayout schedTable;
+    String TAG;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_schedule);
         schedule = new ArrayList<>();
+        gameSchedule = new ArrayList<>();
 
         init();
         Intent intent = getIntent();
@@ -67,6 +73,8 @@ public class CreateSchedule extends AppCompatActivity implements View.OnClickLis
             schedule = genDoubleElim(teams);
         }
 
+        addGameScheds(schedule);
+
         getSupportActionBar().setTitle(intent.getStringExtra("title"));
     }
 
@@ -76,6 +84,7 @@ public class CreateSchedule extends AppCompatActivity implements View.OnClickLis
         mUpdate = findViewById(R.id.btnUpdateTeams);
         mUpdate.setOnClickListener(this);
         teamNamesLayout = findViewById(R.id.teamNameLayout);
+        gamesSchedLayout = findViewById(R.id.gameSchedLayout);
         schedTable = findViewById(R.id.schedule);
     }
 
@@ -100,6 +109,38 @@ public class CreateSchedule extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    private void addGameScheds(ArrayList<HashMap<String, String>> schedule) {
+        for (int i=0; i<schedule.size();i++) {
+            TextInputLayout textInputLayout = new TextInputLayout(this);
+            final TextInputEditText gameSched = new TextInputEditText(this);
+            textInputLayout.setHintTextAppearance(R.style.TextInputHint);
+            gameSched.setText("Set Date");
+            gameSched.setHint("Game " + (schedule.get(i).get("Game")));
+            gameSched.setTextSize(14);
+            gameSched.setTag((schedule.get(i).get("Game")));
+            gameSched.setKeyListener(null);
+            textInputLayout.addView(gameSched);
+            gameSched.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    TAG = gameSched.getTag().toString();
+
+                    Calendar now = Calendar.getInstance();
+                    DatePickerDialog dpd = DatePickerDialog.newInstance(
+                            CreateSchedule.this,
+                            now.get(Calendar.YEAR),
+                            now.get(Calendar.MONTH),
+                            now.get(Calendar.DAY_OF_MONTH)
+                    );
+                    dpd.show(getFragmentManager(), "Schedule Date  ");
+                }
+            });
+
+            gamesSchedLayout.addView(textInputLayout);
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the save_cancel; this adds items to the action bar if it is present.
@@ -111,7 +152,18 @@ public class CreateSchedule extends AppCompatActivity implements View.OnClickLis
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save:
-                save();
+                try {
+                    save();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                return true;
+            case R.id.action_check:
+                try {
+                    isScheduleComplete();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -130,6 +182,7 @@ public class CreateSchedule extends AppCompatActivity implements View.OnClickLis
             newTeamList.add(textInputEditText.getText().toString());
 
         }
+
         origTeams.clear();
         origTeams = newTeamList;
         genSingleElim(teams);
@@ -352,20 +405,71 @@ public class CreateSchedule extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    private void save() {
-        String schedId = RandomStringUtils.randomAlphanumeric(8);
-        SchedRepo schedRepo = new SchedRepo();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+    private void save() throws ParseException {
+        if (isScheduleComplete()) {
+            String schedId = RandomStringUtils.randomAlphanumeric(8);
+            SchedRepo schedRepo = new SchedRepo();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
 
+            schedRepo.insert(schedule, schedId, sdf.format(new Date()), sport, type);
+            schedRepo.insertGameSched(schedId, gameSchedule);
 
-        schedRepo.insert(schedule, schedId, sdf.format(new Date()), sport, type);
+            Toast.makeText(this, "Schedule Saved!", Toast.LENGTH_SHORT).show();
 
-        Toast.makeText(this, "Schedule Saved!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, ScheduleList.class);
+            intent.putExtra("title", "Schedules");
+            startActivity(intent);
 
-        Intent intent = new Intent(this, ScheduleList.class);
-        intent.putExtra("title", "Schedules");
-        startActivity(intent);
+            finish();
+        } else {
+            Toast.makeText(this, "Please complete the game schedule.", Toast.LENGTH_SHORT).show();
+        }
 
-        finish();
+    }
+
+    @Override
+    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, monthOfYear, dayOfMonth);
+        Date date = cal.getTime();
+        DateFormat df = new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());
+
+        for (int i=0;i<schedule.size(); i++) {
+            TextInputLayout textInputLayout = (TextInputLayout) gamesSchedLayout.getChildAt(i);
+            FrameLayout frameLayout = (FrameLayout) textInputLayout.getChildAt(0);
+            TextInputEditText textInputEditText = (TextInputEditText) frameLayout.getChildAt(0);
+            if (textInputEditText.getTag().equals(TAG)) {
+                textInputEditText.setText(df.format(date));
+            }
+        }
+    }
+
+    public boolean isScheduleComplete() throws ParseException {
+        ArrayList<HashMap<String, String>> sched = new ArrayList<>();
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+        for (int i=0;i<schedule.size(); i++) {
+            TextInputLayout textInputLayout = (TextInputLayout) gamesSchedLayout.getChildAt(i);
+            FrameLayout frameLayout = (FrameLayout) textInputLayout.getChildAt(0);
+            TextInputEditText textInputEditText = (TextInputEditText) frameLayout.getChildAt(0);
+
+            if (!textInputEditText.getText().toString().equalsIgnoreCase("Set Date")) {
+                HashMap<String, String> map = new HashMap<>();
+                Date date = new SimpleDateFormat("MMM d, yyyy").parse(textInputEditText.getText().toString());
+                String dateForSQL = df.format(date);
+                map.put("Game", textInputEditText.getTag().toString());
+                map.put("Date", dateForSQL);
+                sched.add(map);
+            } else {
+                break;
+            }
+        }
+
+        if (sched.size() != schedule.size()) {
+            return false;
+        } else {
+            gameSchedule.addAll(sched);
+            return true;
+        }
     }
 }

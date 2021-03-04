@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.cpsu.sportgamegenerator.Data.Repo.SchedRepo;
+import com.cpsu.sportgamegenerator.Data.Repo.SportRepo;
 import com.cpsu.sportgamegenerator.app.App;
 
 
@@ -16,7 +17,7 @@ public class DBHelper extends SQLiteOpenHelper {
     //version number to upgrade database version
     //each time if you Add, Edit table, you need to change the
     //version number.
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
     // Database Name
     private static final String DATABASE_NAME = "sportsgen.db";
     private static final String TAG = DBHelper.class.getSimpleName();
@@ -32,6 +33,8 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SchedRepo.createTblSched());
+        db.execSQL(SportRepo.createSportsTable());
+        db.execSQL(SchedRepo.createTblGameSched());
     }
 
     @Override

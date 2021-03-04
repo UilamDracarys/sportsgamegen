@@ -32,5 +32,6 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     implementation 'org.apache.commons:commons-lang3:3.6'
+    implementation 'com.wdullaer:materialdatetimepicker:3.5.0'
 
 }

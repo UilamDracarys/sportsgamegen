@@ -4,4 +4,8 @@
     <item android:title="View Schedules"
         android:id="@+id/action_view_scheds"
         app:showAsAction="never"/>
+
+    <item android:title="View Sports"
+        android:id="@+id/action_view_sports"
+        app:showAsAction="never"/>
 </menu>

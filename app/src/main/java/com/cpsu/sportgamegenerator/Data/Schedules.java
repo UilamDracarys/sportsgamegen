@@ -2,6 +2,7 @@ package com.cpsu.sportgamegenerator.Data;
 
 public class Schedules {
     public static final String TABLE_SCHEDULES = "schedules";
+    public static final String TABLE_GAMESCHED = "game_schedule";
 
     public static final String COL_SCH_ID = "sch_id";
     public static final String COL_SCH_DATE = "sch_date";
@@ -11,6 +12,10 @@ public class Schedules {
     public static final String COL_SCH_T2 = "sch_t2";
     public static final String COL_SCH_RND = "sch_rnd";
     public static final String COL_SCH_GAME = "sch_game";
+
+    public static final String COL_GAME_SCH_ID = "g_sch_id";
+    public static final String COL_GAME_NO =  "g_game";
+    public static final String COL_GAME_DATE = "g_date";
 
     private String schedId;
     private String date;

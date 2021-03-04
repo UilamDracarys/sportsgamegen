@@ -55,7 +55,7 @@
 
 
             <TextView
-                android:text="SCHEDULE"
+                android:text="TOURNAMENT SCHEDULE"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
@@ -112,6 +112,26 @@
 
                 </TableRow>
             </TableLayout>
+
+            <TextView
+                android:text="SCHEDULE OF GAMES"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:background="@color/colorAccent"
+                />
+
+            <LinearLayout
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:id="@+id/gameSchedLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+
+
         </LinearLayout>
     </ScrollView>
 

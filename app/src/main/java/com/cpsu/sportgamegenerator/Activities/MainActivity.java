@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -17,13 +18,20 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.cpsu.sportgamegenerator.Data.Repo.SportRepo;
+import com.cpsu.sportgamegenerator.Data.Sport;
 import com.cpsu.sportgamegenerator.R;
+import com.cpsu.sportgamegenerator.Utils.SearchableAdapter;
 import com.google.android.material.textfield.TextInputEditText;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     Button mBtnSingle, mBtnDouble;
     String type;
+    SimpleAdapter simpleAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +69,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.action_view_scheds:
                 showSchedList();
                 return true;
+            case R.id.action_view_sports:
+                showSportsList();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -82,6 +93,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final View popUpDlg = layoutInflater.inflate(R.layout.pop_up_dlg, null);
 
         final Spinner sport = popUpDlg.findViewById(R.id.spnSport);
+        SportRepo sportRepo = new SportRepo();
+        ArrayList<HashMap<String, String>> sportList = sportRepo.getSportList();
+        HashMap<String, String> firstItem = new HashMap<>();
+        firstItem.put("ID", "");
+        firstItem.put("Name", "Select sport...");
+        sportList.add(0, firstItem);
+
+        simpleAdapter = new SearchableAdapter(MainActivity.this,
+                sportList,
+                R.layout.activity_sport_list_item,
+                new String[]{"ID", "Name"},
+                new int[]{R.id.sportID, R.id.sportName});
+        sport.setAdapter(simpleAdapter);
+
         final TextInputEditText teams = popUpDlg.findViewById(R.id.txtTeams);
 
         final AlertDialog dialog = new AlertDialog.Builder(this)
@@ -105,26 +130,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(getApplicationContext(), "Number of teams should be from 4 to 10 only.", Toast.LENGTH_SHORT).show();
                 } else {
                     dialog.dismiss();
-                    showSchedule(Integer.parseInt(teams.getText().toString()), sport.getSelectedItem().toString());
+
+                    showSchedule(Integer.parseInt(teams.getText().toString()), sport.getSelectedItem());
                 }
             }
         });
     }
 
-    private void showSchedule(int teams, String sport) {
-        String title = teams + "-Team " + sport + " " + type + " Schedule";
+    private void showSchedule(int teams, Object sportObj) {
+        HashMap<String, String> map = (HashMap<String, String>) sportObj;
+        Sport sport = new Sport();
+        sport.setSportID(map.get("ID"));
+        sport.setSportName(map.get("Name"));
+
+
+        String title = teams + "-Team " + sport.getSportName() + " " + type + " Schedule";
 
         Intent intent = new Intent(this, CreateSchedule.class);
         intent.putExtra("title", title);
         intent.putExtra("noOfTeams", teams);
         intent.putExtra("type", type);
-        intent.putExtra("sport", sport);
+        intent.putExtra("sport", sport.getSportName());
         startActivity(intent);
     }
 
     private void showSchedList() {
         Intent intent = new Intent(this, ScheduleList.class);
         intent.putExtra("title", "Schedules");
+        startActivity(intent);
+    }
+
+    private void showSportsList() {
+        Intent intent = new Intent(this, SportsList.class);
+        intent.putExtra("title", "Sports");
         startActivity(intent);
     }
 
@@ -138,6 +176,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         return true;
     }
-
 
 }
